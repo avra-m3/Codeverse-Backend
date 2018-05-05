@@ -21,6 +21,8 @@ class Problems(Template):
         dothisSQL = 'SELECT * '
         dothisSQL += 'FROM Problems'
         cur.execute(dothisSQL)
+        if cur.rowcount == 0:
+            return None
         self.myConnection.commit()
         queryResult = cur.fetchall()
 
@@ -50,6 +52,9 @@ class Problems(Template):
         cur.execute(dothisSQL, problem_id)
         self.myConnection.commit()
         queryResult = cur.fetchall()
+
+        if cur.rowcount == 0:
+            return None
 
         resultList = list()
 

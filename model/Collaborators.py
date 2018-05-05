@@ -5,8 +5,10 @@
 # Return dict with keys as db columns
 
 import datetime
+import pymysql
 
 from model.Template import Template
+# from Template import Template
 
 
 class Collaborators(Template):
@@ -22,8 +24,12 @@ class Collaborators(Template):
         dothisSQL += 'WHERE Challenge_ID = %s '
         dothisSQL += 'AND User_ID = %s'
         cur.execute(dothisSQL, (challenge_id, user_id))
+        if cur.rowcount == 0:
+            return None
         self.myConnection.commit()
         queryResult = cur.fetchall()
+
+
         resultList = list()
 
         for result in queryResult:
@@ -51,7 +57,9 @@ class Collaborators(Template):
         cur.execute(dothisSQL, challenge_id)
         self.myConnection.commit()
         queryResult = cur.fetchall()
-
+        if cur.rowcount == 0:
+            return None
+        
         resultList = list()
 
         for result in queryResult:
@@ -83,15 +91,27 @@ class Collaborators(Template):
         return
 
     # updateCollaborator(self, challenge_id, user_id)
-    # Updates the user_id associated with a give challenge
+    # Updates the user_id associated with a given challenge
+    # update codeStatus, submittedate, executionTime, SubmissionID
 
-    def updateCollaborator(self, challenge_id, user_id):
+    def updateCollaborator(self, challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, 
+                        SubmissionID):
         dothisSQL = 'UPDATE Collaborators '
-        dothisSQL += 'SET User_ID = %s '
-        dothisSQL += 'WHERE Challenge_ID = %s'
-        cur = self.myConnection.cursor()
-        cur.execute(dothisSQL, (user_id, challenge_id))
-        self.myConnection.commit()
+        dothisSQL += 'SET PlaybackStream = %s, ' 
+        dothisSQL += 'CodeStatus = %s, '
+        dothisSQL += 'SubmittedAt = %s, '
+        dothisSQL += 'ExecutionTime = %s, '
+        dothisSQL += 'SubmissionID = %s '
+        dothisSQL += 'WHERE Challenge_ID = %s '
+        dothisSQL += 'AND User_ID = %s'
+        try:
+            cur = self.myConnection.cursor()
+            cur.execute(dothisSQL, (playbackStream, codeStatus, submittedAt, executionTime, SubmissionID, challenge_id, user_id))
+            self.myConnection.commit()
+        except Error as error:
+            print(error)
+            return None
+        return True
 
 
 if __name__ == "__main__":
@@ -100,7 +120,7 @@ if __name__ == "__main__":
     now = datetime.datetime(2018, 5, 5)
     now.strftime('%Y-%m-%d %H:%M:%S')
 
-    collaborators.createCollaborator(2, 3, "playbackStream", "finished", now, "30", 99)
-    print(collaborators.getCollaborator(2, 2))
-    print(collaborators.listCollaborators(1))
-    collaborators.updateCollaborator(2, 1)
+    # collaborators.createCollaborator(2, 3, "playbackStream", "finished", now, "30", 99)
+    # print(collaborators.getCollaborator(2, 2))
+    # print(collaborators.listCollaborators(1))
+    collaborators.updateCollaborator(4, 4, "playbackStream", "finished", now, "30", 101)
