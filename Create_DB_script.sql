@@ -8,7 +8,7 @@ CREATE DATABASE IF NOT EXISTS testDB;
 USE testDB;
 
 CREATE TABLE Users(
-	User_ID INT NOT NULL,
+	User_ID VARCHAR(100) NOT NULL,
 	firstname VARCHAR(100),
 	lastname VARCHAR(100),
 	PRIMARY KEY( User_ID)
@@ -33,7 +33,7 @@ CREATE TABLE Challenges(
 
 CREATE TABLE Collaborators(
 	Challenge_ID INT,
-	User_ID INT,
+	User_ID VARCHAR(100),
 	PlaybackStream MEDIUMTEXT,
 	CodeStatus VARCHAR(20),
 	SubmittedAt DATETIME DEFAULT NULL,
@@ -91,7 +91,7 @@ INSERT INTO TestCases VALUES
 		2, 
 		"true", 
 		"/* precode */", 
-		"\n if (isPalindrome("madam") == true){putstr(true);} else {putstr(false);}"
+		"\n if (isPalindrome('madam) == true){putstr(true);} else {putstr(false);}"
 	);
 
 INSERT INTO Problems VALUES 
