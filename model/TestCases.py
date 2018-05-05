@@ -1,20 +1,10 @@
 # TestCases - getByProblem_ID return {all cols} 
 
 import pymysql
-import db_config as cfg
+from model.Template import Template
 
 
-
-class TestCases:
-
-    def __init__(self):
-
-        self.myConnection = pymysql.connect(
-            user=cfg.mysql['user'], 
-            password=cfg.mysql['password'], 
-            db=cfg.mysql['db'], 
-            host=cfg.mysql['host'])
-
+class TestCases(Template):
 
 
     # listTestCases(problem_id)

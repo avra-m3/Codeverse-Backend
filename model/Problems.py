@@ -6,18 +6,11 @@
 
 
 import pymysql
-import db_config as cfg
+
+from model.Template import Template
 
 
-class Problems:
-
-    def __init__(self):
-
-        self.myConnection = pymysql.connect(
-            user=cfg.mysql['user'], 
-            password=cfg.mysql['password'], 
-            db=cfg.mysql['db'], 
-            host=cfg.mysql['host'])
+class Problems(Template):
 
 
     # listProblems(self)

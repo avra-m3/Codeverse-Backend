@@ -6,25 +6,15 @@
 # get(status) return list: {Challenge_ID, Problem_ID, CreatedAt}, 
 # get by ID
 
-import pymysql
 import datetime
-import time
-import db_config as cfg
+
+from model.Template import Template
 
 
-class Challenges:
-
-    def __init__(self):
-
-        self.myConnection = pymysql.connect(
-            user=cfg.mysql['user'], 
-            password=cfg.mysql['password'], 
-            db=cfg.mysql['db'],
-            host=cfg.mysql['host']
-            )
+class Challenges(Template):
     # createChallenge(self, problem_id, status)
     # returns Challenge_ID of new challenge created
-    
+
     def createChallenge(self, problem_id, status):
         now = datetime.datetime.now()
         now.strftime('%Y-%m-%d %H:%M:%S')
@@ -48,7 +38,6 @@ class Challenges:
         cur.execute(dothisSQL, (new_status, challenge_id))
         self.myConnection.commit()
 
-
     # listChallenges(self)
     # returns list[ dict{Challenge_ID, Problem_ID, CreatedAt, Status}];
 
@@ -64,7 +53,6 @@ class Challenges:
         resultList = list()
 
         for result in queryResult:
-
             itemDict = dict()
             itemDict['Challenge_ID'] = result[0]
             itemDict['Problem_ID'] = result[1]
@@ -89,7 +77,6 @@ class Challenges:
         resultList = list()
 
         for result in queryResult:
-
             itemDict = dict()
             itemDict['Challenge_ID'] = result[0]
             itemDict['Problem_ID'] = result[1]
@@ -101,9 +88,8 @@ class Challenges:
 
 
 if __name__ == "__main__":
-    challenges = Challenges() 
+    challenges = Challenges()
     print(challenges.createChallenge(2, "In progress"))
     print(challenges.listChallenges("InProgress"))
     print(challenges.getChallenge(1))
     challenges.updateChallengeStatus(5, "Finalised")
-

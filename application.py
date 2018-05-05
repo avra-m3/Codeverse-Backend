@@ -95,17 +95,19 @@ class Collaborators(Resource):
 class Users(Resource):
     def get(self, user_id=None):
         if user_id is None:
-
             abort(501)
-        pass
+        db = db_Users()
+        return jsonify(db.getUser(user_id))
 
-    @validate_request('user_id', 'firstname', 'lastname')
-    def put(self, user_id=None):
+    @validate_request('firstname', 'lastname')
+    def put(self, user_id = None):
+        if user_id is not None:
+            abort(400)
         data = request.json()
-        user_id = user_id or data["user_id"]
         firstname = data['firstname']
         lastname = data['lastname']
-        pass
+        db = db_Users()
+        return jsonify(db.createUser(firstname, lastname))
 
 
 api.add_resource(Problems, '/problems/<string:problem_id>', '/problems', '/problems/')
