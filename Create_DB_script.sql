@@ -62,9 +62,9 @@ INSERT INTO Problems VALUES (1, "TestProblem", 10, "Problem1");
 INSERT INTO Problems VALUES (2, "TestProblem", 10, "Problem2");
 INSERT INTO Problems VALUES (3, "TestProblem", 10, "Problem3");
 
-INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (1, 1, "InProgress");
-INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (2, 2, "InProgress");
-INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (3, 3, "InProgress");
+INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (1, 1, "in progress");
+INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (2, 2, "created");
+INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (3, 3, "done");
 
 INSERT INTO TestCases VALUES (1, 1, "True", "testprecode", "testpostcode");
 

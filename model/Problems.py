@@ -7,73 +7,72 @@
 
 import pymysql
 
-
-class Problems:
-
-	def __init__(self):
-
-		self.myConnection = pymysql.connect(
-			user=cfg.mysql['user'], 
-			password=cfg.mysql['password'], 
-			db=cfg.mysql['db'], 
-			host=cfg.mysql['host'])
+from model.Template import Template
 
 
-	# listProblems(self)
-	# returns list[ dict{Problem ID, Shortname, expected time}];
+class Problems(Template):
 
-	def listProblems(self):
-		cur = self.myConnection.cursor()
- 		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM Problems'
-		cur.execute(dothisSQL)
-		self.myConnection.commit()
-		queryResult = cur.fetchall()
 
-		resultList = list()
+    # listProblems(self)
+    # returns list[ dict{Problem ID, Shortname, expected time}];
 
-		for result in queryResult:
+    def listProblems(self):
+        cur = self.myConnection.cursor()
+        dothisSQL = 'SELECT * '
+        dothisSQL += 'FROM Problems'
+        cur.execute(dothisSQL)
+        if cur.rowcount == 0:
+            return None
+        self.myConnection.commit()
+        queryResult = cur.fetchall()
 
-			itemDict = dict()
-			itemDict['Problem_ID'] = result[0]
-			itemDict['Problem_Statement'] = result[1]
-			itemDict['ExpectedTime'] = result[2]
-			itemDict['Shortname'] = result[3]
-			resultList.append(itemDict)
+        resultList = list()
 
-		# print(resultList)
+        for result in queryResult:
 
-		return resultList
+            itemDict = dict()
+            itemDict['Problem_ID'] = result[0]
+            itemDict['Problem_Statement'] = result[1]
+            itemDict['ExpectedTime'] = result[2]
+            itemDict['Shortname'] = result[3]
+            resultList.append(itemDict)
 
-	# getProblem(self)
-	# returns dict{Problem ID, Shortname, expected time};
+        # print(resultList)
 
-	def getProblem(self, problem_id):
-		cur = self.myConnection.cursor()
- 		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM Problems ' 
- 		dothisSQL += 'WHERE Problem_ID = %s'
-		cur.execute(dothisSQL, problem_id)
-		self.myConnection.commit()
-		queryResult = cur.fetchall()
+        return resultList
 
-		resultList = list()
+    # getProblem(self)
+    # returns dict{Problem ID, Shortname, expected time};
 
-		for result in queryResult:
+    def getProblem(self, problem_id):
+        cur = self.myConnection.cursor()
+        dothisSQL = 'SELECT * '
+        dothisSQL += 'FROM Problems ' 
+        dothisSQL += 'WHERE Problem_ID = %s'
+        cur.execute(dothisSQL, problem_id)
+        self.myConnection.commit()
+        queryResult = cur.fetchall()
 
-			itemDict = dict()
-			itemDict['Problem_ID'] = result[0]
-			itemDict['Problem_Statement'] = result[1]
-			itemDict['ExpectedTime'] = result[2]
-			itemDict['Shortname'] = result[3]
-			resultList.append(itemDict)
+        if cur.rowcount == 0:
+            return None
 
-		# print(resultList[0])
+        resultList = list()
 
-		return resultList[0]
+        for result in queryResult:
+
+            itemDict = dict()
+            itemDict['Problem_ID'] = result[0]
+            itemDict['Problem_Statement'] = result[1]
+            itemDict['ExpectedTime'] = result[2]
+            itemDict['Shortname'] = result[3]
+            resultList.append(itemDict)
+
+        # print(resultList[0])
+
+        return resultList[0]
 
 if __name__ == "__main__":
-	problems = Problems() 
-	print(problems.listProblems())
-	print(problems.getProblem(1))
+    problems = Problems() 
+    print(problems.listProblems())
+    print(problems.getProblem(1))
 

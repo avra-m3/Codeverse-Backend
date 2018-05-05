@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+import os
 from functools import wraps
 
 from flask import *
@@ -8,7 +10,6 @@ import model
 from model.Challenges import Challenges as db_Challenges
 from model.Users import Users as db_Users
 from model.Problems import Problems as db_Problems
-import sphere_integration as sph
 
 application = Flask(__name__)
 CORS(application)
@@ -45,84 +46,102 @@ def validate_request(*expected_args):
 
 class Problems(Resource):
     def get(self, problem_id=None):
+        problems = db_Problems()
         if problem_id is None:
-            return "all problems"
-        return "get problem" + problem_id
+            result = problems.listProblems()
+        else:
+            result = problems.getProblem(problem_id)
+
+        return jsonify(result)
 
 
 class Challenges(Resource):
     def get(self, challenge_id=None):
-        pass
+        if challenge_id is None:
+            challenges = db_Challenges()
+            result = challenges.listChallenges('InProgress')
+            return jsonify(result)
+        return None
 
+    @validate_request('problem_id')
     def put(self, challenge_id=None):
-        pass
+        req = request.json
+        problem_id = req["problem_id"]
+        challenges = db_Challenges()
+        challenge_id = challenges.createChallenge(problem_id, "InProgress")
+        return challenge_id, 200
 
+    @validate_request('status')
     def post(self, challenge_id=None):
-        pass
+        if challenge_id is None:
+            abort(400)
+        req = request.json
+        new_status = req["status"]
+        challenges = db_Challenges()
+        challenges.updateChallengeStatus(challenge_id, new_status)
 
 
 class Collaborators(Resource):
     def get(self, challenge_id, user_id=None):
+        db = model.Collaborators()
         if user_id is None:
-            abort(501)
+            result = db.listCollaborators(challenge_id)
+        else:
+            result = db.getCollaborator(challenge_id, user_id)
+        return jsonify(result)
 
+    @validate_request('stream')
     def put(self, challenge_id, user_id=None):
-        if user_id is None:
-            abort(501)
+        if user_id is not None:
+            abort(400)
+        db = model.Collaborators()
+        challenge_db = model.Challenges()
+        challenge = challenge_db.getChallenge(challenge_id)
+        if challenge is None:
+            abort(400)
+        if challenge["status"] not in ["created", "waiting"]:
+            abort(412)
+        data = request.json()
+        result = db.createCollaborator(challenge_id, user_id, data["stream"], None, None, None, None)
+        if len(challenge_db.listChallenges(challenge_id)) >= 2:
+            challenge_db.updateChallengeStatus(challenge_id, "in progress")
+        else:
+            challenge_db.updateChallengeStatus(challenge_id, "waiting")
 
-    @validate_request()
+    @validate_request('code')
     def post(self, challenge_id, user_id=None):
-        pass
         if user_id is None:
             abort(400)
-        data = request.json()
-        if "code" in data:
-            code = data["code"]
-            challenge = model.Challenges().getChallenge(challenge_id)
-            if challenge is None:
-                abort(400)
-            problem = model.Problems().getProblem(challenge["problem_id"])
-            test_cases = model.TestCases().listTestCases(challenge["problem_id"])
-            case = test_cases[0]
-            code = case["Precode"] + code + case["Postcode"]
-            id = sph.submit(code)
-
-            model.Collaborators.updateCollaborator(challenge_id, user_id,)
+        db = model.Collaborators()
+        db.updateCollaborator(challenge_id, user_id)
 
 
 class Users(Resource):
     def get(self, user_id=None):
         if user_id is None:
             abort(501)
-        pass
+        db = db_Users()
+        return jsonify(db.getUser(user_id))
 
-    @validate_request('user_id', 'firstname', 'lastname')
+    @validate_request('firstname', 'lastname')
     def put(self, user_id=None):
+        if user_id is not None:
+            abort(400)
         data = request.json()
-        user_id = user_id or data["user_id"]
         firstname = data['firstname']
         lastname = data['lastname']
-        pass
-
-
-class Test(Resource):
-    def get(self, challenge_id, user_id, test_id):
-        result = sph.poll(test_id)
-        return jsonify(result)
-
-    @validate_request('source')
-    def put(self, challenge_id, user_id, test_id):
-        data = request.json()
-        lang = "language" in data and data["language"] or 4
-        return sph.submit(data["source"], lang=lang)
+        db = db_Users()
+        return jsonify(db.createUser(firstname, lastname))
 
 
 api.add_resource(Problems, '/problems/<string:problem_id>', '/problems', '/problems/')
 api.add_resource(Users, '/users/<string:user_id>', '/users', '/users/')
-api.add_resource(Challenges, '/challenges/<string:challenge_id>' '/challenges/', '/challenges')
+api.add_resource(Challenges, '/challenges/<string:challenge_id>', '/challenges/', '/challenges')
 api.add_resource(Collaborators, '/challenges/<string:challenge_id>/collaborators/<string:user_id>',
                  '/challenges/<string:challenge_id>/collaborators/', '/challenges/<string:challenge_id>/collaborators')
-api.add_resource(Test, '/challenges/<string:challenge_id>/collaborators/<string:user_id>/compile/<string:test_id>')
 
 if __name__ == '__main__':
-    api.run()
+    if os.getenv("PRODUCTION"):
+        app.run(host='0.0.0.0', port=80)
+    else:
+        api.run()
