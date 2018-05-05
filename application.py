@@ -20,7 +20,7 @@ api = Api(application)
 
 @application.route('/')
 def index():
-    return Response('Online', status=200)
+    return application.send_static_file('index.html')
 
 
 def validate_request(*expected_args):
