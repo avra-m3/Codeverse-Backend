@@ -6,40 +6,53 @@
 
 
 import pymysql
+import db_config as cfg
 
 
 class Users:
 
 	def __init__(self):
-		self.myConnection = pymysql.connect(user='root', password='MyNewPass', db='testDB', host='')
-		# myConnection = pymysql.connect(
-		# 	user='Alex18', 
-		# 	password='coLiOSidereC', 
-		# 	db='testDB', 
-		# 	host='fbhack18db.cdf1m3s6jm9l.ap-southeast-2.rds.amazonaws.com')
+
+		self.myConnection = pymysql.connect(
+			user=cfg.mysql['user'], 
+			password=cfg.mysql['password'], 
+			db=cfg.mysql['db'], 
+			host=cfg.mysql['host'])
 
 	def getUser(self, id):
 		cur = self.myConnection.cursor()
  		dothisSQL = 'SELECT * '
  		dothisSQL += 'FROM Users '
  		dothisSQL += 'WHERE User_ID = %s'
-		cur.execute(insertSQL, id)
+		cur.execute(dothisSQL, id)
 		self.myConnection.commit()
 		queryResult = cur.fetchall()
-		# print(queryResult)
-		return queryResult[0] #Should return user object 
+		resultList = list()
+		
+		for result in queryResult:
 
-	def createUser(self, id, firstname, lastname):
+			itemDict = dict()
+			itemDict['User_ID'] = result[0]
+			itemDict['firstname'] = result[1]
+			itemDict['lastname'] = result[2]
+			resultList.append(itemDict)
+
+		# print(resultList[0])
+
+		return resultList[0]
+
+	def createUser(self, firstname, lastname):
 		dothisSQL = 'INSERT INTO Users '
- 		dothisSQL += 'VALUES ( %s, %s, %s)'
+		dothisSQL += '(firstname, lastname) '
+ 		dothisSQL += 'VALUES ( %s, %s)'
 		cur = self.myConnection.cursor()
-		# print(dothisSQL)
-		cur.execute(dothisSQL, (id, firstname, lastname))
+		cur.execute(dothisSQL, (firstname, lastname))
 		self.myConnection.commit()
+		print(cur.lastrowid)
+		return cur.lastrowid
 
 if __name__ == "__main__":
 	users = Users() 
-	# db.insertUser(3, "test", "user")
-	# user.getUser(3)
-	users.createUser(4, "test", "user4")
+	users.createUser("test", "user6")
+	print(users.getUser(3))
 

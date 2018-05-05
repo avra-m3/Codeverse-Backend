@@ -12,12 +12,43 @@ import time
 class Collaborators:
 
 	def __init__(self):
-		self.myConnection = pymysql.connect(user='root', password='MyNewPass', db='testDB', host='')
-		# myConnection = pymysql.connect(
-		# 	user='Alex18', 
-		# 	password='coLiOSidereC', 
-		# 	db='testDB', 
-		# 	host='fbhack18db.cdf1m3s6jm9l.ap-southeast-2.rds.amazonaws.com')
+
+		self.myConnection = pymysql.connect(
+			user=cfg.mysql['user'], 
+			password=cfg.mysql['password'], 
+			db=cfg.mysql['db'], 
+			host=cfg.mysql['host'])
+
+
+
+	# getCollaborators(self, challenge_id); 
+	# returns list [ Dict { Challenge_ID, User_ID, PlaybackStream, CodeStatus, 
+	#	SubmittedAt, ExecutionTime, SubmissionID} ]; 
+
+	def getCollaborator(self, challenge_id, user_id):
+			cur = self.myConnection.cursor()
+	 		dothisSQL = 'SELECT * '
+	 		dothisSQL += 'FROM Collaborators '
+	 		dothisSQL += 'WHERE Challenge_ID = %s '
+	 		dothisSQL += 'AND User_ID = %s'
+			cur.execute(dothisSQL, (challenge_id, user_id))
+			self.myConnection.commit()
+			queryResult = cur.fetchall()
+			resultList = list()
+			
+			for result in queryResult:
+
+				itemDict = dict()
+				itemDict['Challenge_ID'] = result[0]
+				itemDict['User_ID'] = result[1]
+				itemDict['PlaybackStream'] = result[2]
+				itemDict['CodeStatus'] = result[3]
+				itemDict['SubmittedAt'] = result[4]
+				itemDict['ExecutionTime'] = result[5]
+				itemDict['SubmissionID'] = result[6]
+				resultList.append(itemDict)
+
+			return resultList[0]
 
 	# listCollaborators(self, challenge_id); 
 	# returns list [ Dict { Challenge_ID, User_ID, PlaybackStream, CodeStatus, 
@@ -80,8 +111,8 @@ if __name__ == "__main__":
 	now = datetime.datetime(2018, 5, 5)
 	now.strftime('%Y-%m-%d %H:%M:%S')
 
-	# collaborators.createCollaborator(2,2,"playbackStream","finished", now, "30", 99)
-	# collaborators.getCollaborator(2)
-	collaborators.listCollaborators(1)
-	# collaborators.updateCollaborator(2,1)
+	collaborators.createCollaborator(2,3,"playbackStream","finished", now, "30", 99)
+	print(collaborators.getCollaborator(2,2))
+	print(collaborators.listCollaborators(1))
+	collaborators.updateCollaborator(2,1)
 

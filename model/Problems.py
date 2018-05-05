@@ -11,12 +11,13 @@ import pymysql
 class Problems:
 
 	def __init__(self):
-		self.myConnection = pymysql.connect(user='root', password='MyNewPass', db='testDB', host='')
-		# myConnection = pymysql.connect(
-		# 	user='Alex18', 
-		# 	password='coLiOSidereC', 
-		# 	db='testDB', 
-		# 	host='fbhack18db.cdf1m3s6jm9l.ap-southeast-2.rds.amazonaws.com')
+
+		self.myConnection = pymysql.connect(
+			user=cfg.mysql['user'], 
+			password=cfg.mysql['password'], 
+			db=cfg.mysql['db'], 
+			host=cfg.mysql['host'])
+
 
 	# listProblems(self)
 	# returns list[ dict{Problem ID, Shortname, expected time}];
@@ -24,7 +25,7 @@ class Problems:
 	def listProblems(self):
 		cur = self.myConnection.cursor()
  		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM PROBLEMS'
+ 		dothisSQL += 'FROM Problems'
 		cur.execute(dothisSQL)
 		self.myConnection.commit()
 		queryResult = cur.fetchall()
@@ -50,7 +51,7 @@ class Problems:
 	def getProblem(self, problem_id):
 		cur = self.myConnection.cursor()
  		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM PROBLEMS ' 
+ 		dothisSQL += 'FROM Problems ' 
  		dothisSQL += 'WHERE Problem_ID = %s'
 		cur.execute(dothisSQL, problem_id)
 		self.myConnection.commit()
@@ -73,8 +74,6 @@ class Problems:
 
 if __name__ == "__main__":
 	problems = Problems() 
-	# db.insertUser(3, "test", "user")
-	# user.getUser(3)
-	problems.listProblems()
-	# problems.getProblems(1)
+	print(problems.listProblems())
+	print(problems.getProblem(1))
 

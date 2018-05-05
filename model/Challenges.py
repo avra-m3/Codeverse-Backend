@@ -14,12 +14,13 @@ import time
 class Challenges:
 
 	def __init__(self):
-		self.myConnection = pymysql.connect(user='root', password='MyNewPass', db='testDB', host='')
-		# myConnection = pymysql.connect(
-		# 	user='Alex18', 
-		# 	password='coLiOSidereC', 
-		# 	db='testDB', 
-		# 	host='fbhack18db.cdf1m3s6jm9l.ap-southeast-2.rds.amazonaws.com')
+
+		self.myConnection = pymysql.connect(
+			user=cfg.mysql['user'], 
+			password=cfg.mysql['password'], 
+			db=cfg.mysql['db'], 
+			host=cfg.mysql['host'])
+
 
 
 
@@ -31,7 +32,7 @@ class Challenges:
 		now = datetime.datetime.now()
 		now.strftime('%Y-%m-%d %H:%M:%S')
 
-		dothisSQL = 'INSERT INTO CHALLENGES '
+		dothisSQL = 'INSERT INTO Challenges '
  		dothisSQL += '(Problem_ID, CreatedAt, Status) '
  		dothisSQL += 'VALUES ( %s, %s, %s)'
 		cur = self.myConnection.cursor()
@@ -43,11 +44,9 @@ class Challenges:
 	# Updates the status associated with a given challenge
 
 	def updateChallengeStatus(self, challenge_id, new_status):
-		dothisSQL = 'UPDATE CHALLENGES '
-		dothisSQL += 'SET STATUS = %s '
-		dothisSQL += 'WHERE CHALLENGE_ID = %s'
-
-		print(dothisSQL)
+		dothisSQL = 'UPDATE Challenges '
+		dothisSQL += 'SET Status = %s '
+		dothisSQL += 'WHERE Challenge_ID = %s'
 		cur = self.myConnection.cursor()
 		cur.execute(dothisSQL, (new_status, challenge_id))
 		self.myConnection.commit()
@@ -59,8 +58,8 @@ class Challenges:
 	def listChallenges(self, status):
 		cur = self.myConnection.cursor()
  		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM CHALLENGES '
- 		dothisSQL += 'WHERE STATUS = %s'
+ 		dothisSQL += 'FROM Challenges '
+ 		dothisSQL += 'WHERE Status = %s'
 		cur.execute(dothisSQL, status)
 		self.myConnection.commit()
 		queryResult = cur.fetchall()
@@ -76,7 +75,7 @@ class Challenges:
 			itemDict['Status'] = result[3]
 			resultList.append(itemDict)
 
-		# print(resultList)
+		print(resultList)
 
 		return resultList
 
@@ -86,8 +85,8 @@ class Challenges:
 	def getChallenge(self, challenge_ID):
 		cur = self.myConnection.cursor()
  		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM CHALLENGES '
- 		dothisSQL += 'WHERE CHALLENGE_ID = %s'
+ 		dothisSQL += 'FROM Challenges '
+ 		dothisSQL += 'WHERE Challenge_ID = %s'
 		cur.execute(dothisSQL, challenge_ID)
 		self.myConnection.commit()
 		queryResult = cur.fetchall()
@@ -103,17 +102,13 @@ class Challenges:
 			itemDict['Status'] = result[3]
 			resultList.append(itemDict)
 
-		# print(resultList[0])
-
 		return resultList[0]
 
 
 if __name__ == "__main__":
 	challenges = Challenges() 
-
-	# challenges.createChallenge(1, "In progress")
-	# challenges.listChallenges("InProgress")
-	# challenges.getChallenge(1)
-	# challenges.updateChallengeStatus(1, "Finalised")
-	# challenges.createChallenge(4, 1, now, "In progress")
+	print(challenges.createChallenge(2, "In progress"))
+	print(challenges.listChallenges("InProgress"))
+	print(challenges.getChallenge(1))
+	challenges.updateChallengeStatus(5, "Finalised")
 

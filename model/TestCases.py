@@ -6,12 +6,14 @@ import pymysql
 class TestCases:
 
 	def __init__(self):
-		self.myConnection = pymysql.connect(user='root', password='MyNewPass', db='testDB', host='')
-		# myConnection = pymysql.connect(
-		# 	user='Alex18', 
-		# 	password='coLiOSidereC', 
-		# 	db='testDB', 
-		# 	host='fbhack18db.cdf1m3s6jm9l.ap-southeast-2.rds.amazonaws.com')
+
+		self.myConnection = pymysql.connect(
+			user=cfg.mysql['user'], 
+			password=cfg.mysql['password'], 
+			db=cfg.mysql['db'], 
+			host=cfg.mysql['host'])
+
+
 
 	# listTestCases(problem_id)
 	# returns List [ dict{"TestCase_ID", "Problem_ID", "ExpectedOutput", "Precode", "Postcode"} ]
@@ -19,7 +21,7 @@ class TestCases:
 	def listTestCases(self, problem_id):
 		cur = self.myConnection.cursor()
  		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM TESTCASES ' 
+ 		dothisSQL += 'FROM TestCases ' 
  		dothisSQL += 'WHERE Problem_ID = %s'
 		cur.execute(dothisSQL, problem_id)
 		self.myConnection.commit()
@@ -37,11 +39,9 @@ class TestCases:
 			itemDict['Postcode'] = result[4]
 			resultList.append(itemDict)
 
-		print(resultList)
-
 		return resultList
 
 if __name__ == "__main__":
 	testcases = TestCases() 
-	testcases.listTestCases(1)
+	print(testcases.listTestCases(1))
 
