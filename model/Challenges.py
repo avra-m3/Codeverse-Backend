@@ -9,7 +9,6 @@
 import pymysql
 import datetime
 import time
-import db_config as cfg
 
 
 class Challenges:
