@@ -167,11 +167,15 @@ class Users(Resource):
 
 
 class TestCode(Resource):
-    def get(self, id):
+    def get(self, id = None):
+        if id is None:
+            abort(400)
         return sph.poll(id)
 
     @validate_request('source')
-    def post(self):
+    def post(self, id = None):
+        if id is not None:
+            abort(400)
         return sph.submit(source=request.json["source"])
 
 
