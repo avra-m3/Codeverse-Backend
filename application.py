@@ -4,6 +4,10 @@ from flask import *
 from flask_cors import CORS
 from flask_restful import Api, Resource
 
+import model
+from model.Challenges import Challenges as db_Challenges
+from model.Users import Users as db_Users
+from model.Problems import Problems as db_Problems
 import sphere_integration as sph
 
 application = Flask(__name__)
@@ -66,8 +70,24 @@ class Collaborators(Resource):
         if user_id is None:
             abort(501)
 
+    @validate_request()
     def post(self, challenge_id, user_id=None):
         pass
+        if user_id is None:
+            abort(400)
+        data = request.json()
+        if "code" in data:
+            code = data["code"]
+            challenge = model.Challenges().getChallenge(challenge_id)
+            if challenge is None:
+                abort(400)
+            problem = model.Problems().getProblem(challenge["problem_id"])
+            test_cases = model.TestCases().listTestCases(challenge["problem_id"])
+            case = test_cases[0]
+            code = case["Precode"] + code + case["Postcode"]
+            id = sph.submit(code)
+
+            model.Collaborators.updateCollaborator(challenge_id, user_id,)
 
 
 class Users(Resource):
