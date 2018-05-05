@@ -7,82 +7,84 @@
 # Usage: see bottom of file
 # 
 ##
-import config as cfg #config.py
-from sphere_engine import CompilersClientV3
+import os
 
-class Submission:
+import requests
+from flask_restful import abort
 
-    # sphere engine API client
-    client = CompilersClientV3(cfg.accessToken, cfg.endpoint)
+AUTH_TOKEN = os.getenv('SPHERE_AUTH')
+ENDPOINT = os.getenv('SPHERE_ENDPOINT')
+SPHERE_STATUS_MAPPING = ["finished", "compilation", "running"]
+SPHERE_ERR_MAPPING = {
+    11: "compilation error",
+    12: "runtime error",
+    13: "time limit exceeded",
+    17: "memory limit exceeded",
+    19: "forbidden system call",
+    20: "not your fault error",
+}
 
-    # Begin processing a given piece of code with some input
-    # @param source         : code to be executed
-    # @param input          : provided as stdin to the source code
-    # @param lang (optional): default python, more codes below:
-    # https://sphere-engine.com/docs/other/languages
-    
-    # @return submissionId  : unique identifier of sphere engine submission
 
-    @classmethod
-    def processSubmission(self, source, input, lang=4):
+def submit(source, input="", lang=4):
+    url = ENDPOINT + '/api/v3/submissions/?access_token=' + AUTH_TOKEN
+    headers = {
+        "Content-Type": 'application/json'
+    }
+    content = {
+        "compilerId": lang,
+        "sourceCode": source,
+        "input": input
+    }
+    print(content)
+    # response = requests.post(url, headers=headers, data=content)
 
-        # The result needs time to be processed
-        response = Submission.client.submissions.create(source, lang, input)
-
-        challengeId = response['id']
-
-        # for now we want to keep track of a challengeId
-        if not challengeId > 0: 
-            print 'Submission was not uploaded successfully'
-
-        return challengeId
-
-    # Get the result of a particular submission
-    # @param submissionId    : submissionId of a previous submission
+    # if response.status_code != 201:
+    #     print(response.content)
+    #     print(response.status_code)
+    #     abort(502)
+    # return response.json()["id"]
     #
-    # @return (success, stdout, stderr, time, memory)
-    @classmethod
-    def getSubmissionResult(self, submissionId):
-        
-        response = self.client.submissions.get(submissionId, with_output=True, with_stderr=True)
 
-        if response['status'] == 0:
-            success = True
-        else:
-            success = False
-
-        return (
-            success,
-            response['output'],
-            response['stderr'],
-            response['time'],
-            response['memory']
-        )
-        
-
-
-if __name__ == "__main__":
-
-    # sample submissions for testing
-    print Submission.getSubmissionResult(68637730)
-
-    print Submission.getSubmissionResult(68637726)
-
-    source = '''
-    import sys
-
-    def plusfive(a):
-        return a+5
-
-    print sys.stdin
-    data = sys.stdin.readlines()
-    print plusfive(3)
-    '''
-    testinput = 135
-
-    # Test submission, dont use up our free compiles!!
-    # challengeId = Submission.processSubmission(source, testinput)
-
-
-    # some sort of timeout thing...
-    # success, stdout, stderr, time, memory = Submission.getSubmissionResult(challengeId)
+def poll(id):
+    url = ENDPOINT + '/api/v3/submissions/' + id
+    params = {
+        "access_token": AUTH_TOKEN,
+        "withOutput": True,
+        "withStderr": True
+    }
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        abort(502)
+    data = response.json()
+    if data["status"] < 0:
+        return {
+                   "id": id,
+                   "status": "in queue",
+               }, False
+    elif data["status"] != 0:
+        return {
+                   "id": id,
+                   "status": SPHERE_STATUS_MAPPING[data["status"]],
+               }, False
+    if data["result"] == 15:
+        output = {
+            "type": data["output_type"],
+            "value": data["output"],
+        }
+    else:
+        type = "generic error"
+        if data["result"] in SPHERE_ERR_MAPPING:
+            type = SPHERE_ERR_MAPPING[data["result"]]
+        output = {
+            "type": type,
+            "value": data["stderr"]
+        }
+    result = {
+        "id": id,
+        "status": "finished",
+        "time": data["time"],
+        "success": data["result"] != 15,
+        "memory": data["memory"],
+        "output": output
+    }
+    return result, data["result"] == 15
