@@ -61,10 +61,8 @@ class Challenges(Resource):
     @validate_request('problem_id')
     def put(self, challenge_id=None):
         req = request.json
-        # print(req)
         problem_id = req["problem_id"]
         challenges = db_Challenges()
-        # print(problem_id)
         challenge_id = challenges.createChallenge(problem_id, "InProgress")
         return challenge_id, 200
 
@@ -74,8 +72,6 @@ class Challenges(Resource):
             abort(400)
         req = request.json
         new_status = req["status"]
-        print(new_status)
-        print(challenge_id)
         challenges = db_Challenges()
         challenges.updateChallengeStatus(challenge_id, new_status)
 
