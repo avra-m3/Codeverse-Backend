@@ -119,4 +119,3 @@ INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (2, 2, "InProgr
 INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (3, 3, "InProgress");
 
 
-
