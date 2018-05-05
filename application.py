@@ -125,13 +125,14 @@ class Users(Resource):
 
     @validate_request('firstname', 'lastname')
     def put(self, user_id=None):
-        if user_id is not None:
+        if user_id is None:
             abort(400)
-        data = request.json()
+        data = request.json
         firstname = data['firstname']
         lastname = data['lastname']
+        print(firstname, lastname, user_id)
         db = db_Users()
-        return jsonify(db.createUser(firstname, lastname))
+        return jsonify(db.createUser(user_id, firstname, lastname))
 
 
 api.add_resource(Problems, '/problems/<string:problem_id>', '/problems', '/problems/')

@@ -8,7 +8,7 @@ CREATE DATABASE IF NOT EXISTS testDB;
 USE testDB;
 
 CREATE TABLE Users(
-	User_ID INT NOT NULL AUTO_INCREMENT,
+	User_ID INT NOT NULL,
 	firstname VARCHAR(100),
 	lastname VARCHAR(100),
 	PRIMARY KEY( User_ID)
@@ -54,20 +54,69 @@ CREATE TABLE TestCases(
 	FOREIGN KEY(Problem_ID) REFERENCES Problems(Problem_ID)
 );
 
+
+
 INSERT INTO Users VALUES (1, "Test", "User1");
 INSERT INTO Users VALUES (2, "Test", "User2");
 INSERT INTO Users VALUES (3, "Test", "User3");
 
-INSERT INTO Problems VALUES (1, "TestProblem", 10, "Problem1");
-INSERT INTO Problems VALUES (2, "TestProblem", 10, "Problem2");
-INSERT INTO Problems VALUES (3, "TestProblem", 10, "Problem3");
+INSERT INTO Problems VALUES 
+	(	1, 
+		"Input:  An int x between zero and 50 
+		Problem: Write a function that returns x + 3
+		MethodSignature: function plusThree(x){ //Your Code Here// }", 
+		10, 
+		"PlusThree Problem"
+	);
 
-INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (1, 1, "in progress");
-INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (2, 2, "created");
-INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (3, 3, "done");
+INSERT INTO TestCases VALUES 
+	(	1, 
+		1, 
+		"true", 
+		"/* precode */", 
+		"\nif (plusThree(5) == 8){putstr(true);} else {putstr(false);}"
+	);
 
-INSERT INTO TestCases VALUES (1, 1, "True", "testprecode", "testpostcode");
+INSERT INTO Problems VALUES 
+	(	2, 
+		"Write a function that tests whether a string is a palindrome.
+		Return true if StringA is a palindrome, else false
+		MethodSignature: function isPalindrome(StringA){ //Your Code Here// }", 
+		10, 
+		"isPalindromeProblem"
+	);
 
+INSERT INTO TestCases VALUES 
+	(	2, 
+		2, 
+		"true", 
+		"/* precode */", 
+		"\n if (isPalindrome("madam") == true){putstr(true);} else {putstr(false);}"
+	);
+
+INSERT INTO Problems VALUES 
+	(	3, 
+		"Given two strings, write a program that efficiently finds the longest common subsequence.
+		Return a string being that longest common subsequence.
+		MethodSignature: function getCommonSubsequence(stringA, stringB){ //Your Code Here// }", 
+		10, 
+		"getCommonSubsquenceProblem"
+	);
+
+INSERT INTO TestCases VALUES 
+	(	3, 
+		3, 
+		"true", 
+		"/* precode */", 
+		"\nif (getCommonSubsequence('abaacd', 'dbaacd').localeCompare('baacd') == 0)
+			{putstr(true);} 
+			else {putstr(false);}"
+	);
+
+
+INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (1, 1, "InProgress");
+INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (2, 2, "InProgress");
+INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (3, 3, "InProgress");
 
 
 

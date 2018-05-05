@@ -27,18 +27,14 @@ class Users(Template):
             itemDict['lastname'] = result[2]
             resultList.append(itemDict)
 
-        # print(resultList[0])
-
         return resultList[0]
 
-    def createUser(self, firstname, lastname):
+    def createUser(self, user_id, firstname, lastname):
         dothisSQL = 'INSERT INTO Users '
-        dothisSQL += '(firstname, lastname) '
-        dothisSQL += 'VALUES ( %s, %s)'
+        dothisSQL += 'VALUES ( %s, %s, %s)'
         cur = self.myConnection.cursor()
-        cur.execute(dothisSQL, (firstname, lastname))
+        cur.execute(dothisSQL, (user_id, firstname, lastname))
         self.myConnection.commit()
-        print(cur.lastrowid)
         return cur.lastrowid
 
 if __name__ == "__main__":
