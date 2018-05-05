@@ -1,45 +1,48 @@
 # User
-
 # Return dict with keys as db columns
-
 # Users - get, create
 
 
 import pymysql
 
+from model.Template import Template
 
-class Users:
 
-	def __init__(self):
-		self.myConnection = pymysql.connect(user='root', password='MyNewPass', db='testDB', host='')
-		# myConnection = pymysql.connect(
-		# 	user='Alex18', 
-		# 	password='coLiOSidereC', 
-		# 	db='testDB', 
-		# 	host='fbhack18db.cdf1m3s6jm9l.ap-southeast-2.rds.amazonaws.com')
+class Users(Template):
+    def getUser(self, id):
+        cur = self.myConnection.cursor()
+        dothisSQL = 'SELECT * '
+        dothisSQL += 'FROM Users '
+        dothisSQL += 'WHERE User_ID = %s'
+        cur.execute(dothisSQL, id)
+        self.myConnection.commit()
+        queryResult = cur.fetchall()
+        resultList = list()
+        
+        for result in queryResult:
 
-	def getUser(self, id):
-		cur = self.myConnection.cursor()
- 		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM Users '
- 		dothisSQL += 'WHERE User_ID = %s'
-		cur.execute(insertSQL, id)
-		self.myConnection.commit()
-		queryResult = cur.fetchall()
-		# print(queryResult)
-		return queryResult[0] #Should return user object 
+            itemDict = dict()
+            itemDict['User_ID'] = result[0]
+            itemDict['firstname'] = result[1]
+            itemDict['lastname'] = result[2]
+            resultList.append(itemDict)
 
-	def createUser(self, id, firstname, lastname):
-		dothisSQL = 'INSERT INTO Users '
- 		dothisSQL += 'VALUES ( %s, %s, %s)'
-		cur = self.myConnection.cursor()
-		# print(dothisSQL)
-		cur.execute(dothisSQL, (id, firstname, lastname))
-		self.myConnection.commit()
+        # print(resultList[0])
+
+        return resultList[0]
+
+    def createUser(self, firstname, lastname):
+        dothisSQL = 'INSERT INTO Users '
+        dothisSQL += '(firstname, lastname) '
+        dothisSQL += 'VALUES ( %s, %s)'
+        cur = self.myConnection.cursor()
+        cur.execute(dothisSQL, (firstname, lastname))
+        self.myConnection.commit()
+        print(cur.lastrowid)
+        return cur.lastrowid
 
 if __name__ == "__main__":
-	users = Users() 
-	# db.insertUser(3, "test", "user")
-	# user.getUser(3)
-	users.createUser(4, "test", "user4")
+    users = Users() 
+    users.createUser("test", "user6")
+    print(users.getUser(3))
 
