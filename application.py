@@ -4,6 +4,8 @@ from flask import *
 from flask_cors import CORS
 from flask_restful import Api, Resource
 
+import sphere_integration as sph
+
 application = Flask(__name__)
 CORS(application)
 api = Api(application)
@@ -83,11 +85,24 @@ class Users(Resource):
         pass
 
 
+class Test(Resource):
+    def get(self, challenge_id, user_id, test_id):
+        result = sph.poll(test_id)
+        return result
+
+    @validate_request('source')
+    def put(self, challenge_id, user_id, test_id):
+        data = request.json()
+        lang = "language" in data and data["language"] or 4
+        return sph.submit(data["source"], lang=lang)
+
+
 api.add_resource(Problems, '/problems/<string:problem_id>', '/problems', '/problems/')
 api.add_resource(Users, '/users/<string:user_id>', '/users', '/users/')
 api.add_resource(Challenges, '/challenges/<string:challenge_id>' '/challenges/', '/challenges')
 api.add_resource(Collaborators, '/challenges/<string:challenge_id>/collaborators/<string:user_id>',
                  '/challenges/<string:challenge_id>/collaborators/', '/challenges/<string:challenge_id>/collaborators')
+api.add_resource(Test, '/challenges/<string:challenge_id>/collaborators/<string:user_id>/compile/<string:test_id>')
 
 if __name__ == '__main__':
     api.run()
