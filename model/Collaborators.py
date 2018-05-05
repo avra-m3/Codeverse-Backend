@@ -4,50 +4,40 @@
 # get create list update
 # Return dict with keys as db columns
 
-import pymysql
 import datetime
-import time
-import db_config as cfg
+
+from model.Template import Template
 
 
-class Collaborators:
+class Collaborators(Template):
 
-    def __init__(self):
-
-        self.myConnection = pymysql.connect(
-            user=cfg.mysql['user'], 
-            password=cfg.mysql['password'], 
-            db=cfg.mysql['db'], 
-            host=cfg.mysql['host'])
-        
     # getCollaborators(self, challenge_id); 
     # returns list [ Dict { Challenge_ID, User_ID, PlaybackStream, CodeStatus, 
     #   SubmittedAt, ExecutionTime, SubmissionID} ]; 
-    
+
     def getCollaborator(self, challenge_id, user_id):
-            cur = self.myConnection.cursor()
-            dothisSQL = 'SELECT * '
-            dothisSQL += 'FROM Collaborators '
-            dothisSQL += 'WHERE Challenge_ID = %s '
-            dothisSQL += 'AND User_ID = %s'
-            cur.execute(dothisSQL, (challenge_id, user_id))
-            self.myConnection.commit()
-            queryResult = cur.fetchall()
-            resultList = list()
-            
-            for result in queryResult:
+        cur = self.myConnection.cursor()
+        dothisSQL = 'SELECT * '
+        dothisSQL += 'FROM Collaborators '
+        dothisSQL += 'WHERE Challenge_ID = %s '
+        dothisSQL += 'AND User_ID = %s'
+        cur.execute(dothisSQL, (challenge_id, user_id))
+        self.myConnection.commit()
+        queryResult = cur.fetchall()
+        resultList = list()
 
-                itemDict = dict()
-                itemDict['Challenge_ID'] = result[0]
-                itemDict['User_ID'] = result[1]
-                itemDict['PlaybackStream'] = result[2]
-                itemDict['CodeStatus'] = result[3]
-                itemDict['SubmittedAt'] = result[4]
-                itemDict['ExecutionTime'] = result[5]
-                itemDict['SubmissionID'] = result[6]
-                resultList.append(itemDict)
+        for result in queryResult:
+            itemDict = dict()
+            itemDict['Challenge_ID'] = result[0]
+            itemDict['User_ID'] = result[1]
+            itemDict['PlaybackStream'] = result[2]
+            itemDict['CodeStatus'] = result[3]
+            itemDict['SubmittedAt'] = result[4]
+            itemDict['ExecutionTime'] = result[5]
+            itemDict['SubmissionID'] = result[6]
+            resultList.append(itemDict)
 
-            return resultList[0]
+        return resultList[0]
 
     # listCollaborators(self, challenge_id); 
     # returns list [ Dict { Challenge_ID, User_ID, PlaybackStream, CodeStatus, 
@@ -65,7 +55,6 @@ class Collaborators:
         resultList = list()
 
         for result in queryResult:
-
             itemDict = dict()
             itemDict['Challenge_ID'] = result[0]
             itemDict['User_ID'] = result[1]
@@ -80,15 +69,16 @@ class Collaborators:
 
         return resultList
 
-
     # createCollaborator(self, challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, submissionID)
 
-    def createCollaborator(self, challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, submissionID):
+    def createCollaborator(self, challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime,
+                           submissionID):
         dothisSQL = 'INSERT INTO Collaborators '
         dothisSQL += 'VALUES ( %s, %s, %s, %s, %s, %s, %s)'
         cur = self.myConnection.cursor()
         # print(dothisSQL)
-        cur.execute(dothisSQL, (challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, submissionID))
+        cur.execute(dothisSQL,
+                    (challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, submissionID))
         self.myConnection.commit()
         return
 
@@ -105,13 +95,12 @@ class Collaborators:
 
 
 if __name__ == "__main__":
-    collaborators = Collaborators() 
+    collaborators = Collaborators()
 
     now = datetime.datetime(2018, 5, 5)
     now.strftime('%Y-%m-%d %H:%M:%S')
 
-    collaborators.createCollaborator(2,3,"playbackStream","finished", now, "30", 99)
-    print(collaborators.getCollaborator(2,2))
+    collaborators.createCollaborator(2, 3, "playbackStream", "finished", now, "30", 99)
+    print(collaborators.getCollaborator(2, 2))
     print(collaborators.listCollaborators(1))
-    collaborators.updateCollaborator(2,1)
-
+    collaborators.updateCollaborator(2, 1)
