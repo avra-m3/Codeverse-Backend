@@ -26,8 +26,8 @@ class Collaborators:
 	def listCollaborators(self, challenge_id):
 		cur = self.myConnection.cursor()
  		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM COLLABORATORS '
- 		dothisSQL += 'WHERE CHALLENGE_ID = %s'
+ 		dothisSQL += 'FROM Collaborators '
+ 		dothisSQL += 'WHERE Challenge_ID = %s'
 		cur.execute(dothisSQL, challenge_id)
 		self.myConnection.commit()
 		queryResult = cur.fetchall()
@@ -54,7 +54,7 @@ class Collaborators:
 	# createCollaborator(self, challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, submissionID)
 
 	def createCollaborator(self, challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, submissionID):
-		dothisSQL = 'INSERT INTO COLLABORATORS '
+		dothisSQL = 'INSERT INTO Collaborators '
  		dothisSQL += 'VALUES ( %s, %s, %s, %s, %s, %s, %s)'
 		cur = self.myConnection.cursor()
 		# print(dothisSQL)
@@ -66,9 +66,9 @@ class Collaborators:
 	# Updates the user_id associated with a give challenge
 
 	def updateCollaborator(self, challenge_id, user_id):
-		dothisSQL = 'UPDATE COLLABORATORS '
-		dothisSQL += 'SET USER_ID = %s '
-		dothisSQL += 'WHERE CHALLENGE_ID = %s'
+		dothisSQL = 'UPDATE Collaborators '
+		dothisSQL += 'SET User_ID = %s '
+		dothisSQL += 'WHERE Challenge_ID = %s'
 		cur = self.myConnection.cursor()
 		cur.execute(dothisSQL, (user_id, challenge_id))
 		self.myConnection.commit()

@@ -21,7 +21,7 @@ class Users:
 	def getUser(self, id):
 		cur = self.myConnection.cursor()
  		dothisSQL = 'SELECT * '
- 		dothisSQL += 'FROM USERS '
+ 		dothisSQL += 'FROM Users '
  		dothisSQL += 'WHERE User_ID = %s'
 		cur.execute(insertSQL, id)
 		self.myConnection.commit()
@@ -30,7 +30,7 @@ class Users:
 		return queryResult[0] #Should return user object 
 
 	def createUser(self, id, firstname, lastname):
-		dothisSQL = 'INSERT INTO USERS '
+		dothisSQL = 'INSERT INTO Users '
  		dothisSQL += 'VALUES ( %s, %s, %s)'
 		cur = self.myConnection.cursor()
 		# print(dothisSQL)

@@ -54,19 +54,19 @@ CREATE TABLE TestCases(
 	FOREIGN KEY(Problem_ID) REFERENCES Problems(Problem_ID)
 );
 
-INSERT INTO USERS VALUES (1, "Test", "User1");
-INSERT INTO USERS VALUES (2, "Test", "User2");
-INSERT INTO USERS VALUES (3, "Test", "User3");
+INSERT INTO Users VALUES (1, "Test", "User1");
+INSERT INTO Users VALUES (2, "Test", "User2");
+INSERT INTO Users VALUES (3, "Test", "User3");
 
-INSERT INTO PROBLEMS VALUES (1, "TestProblem", 10, "Problem1");
-INSERT INTO PROBLEMS VALUES (2, "TestProblem", 10, "Problem2");
-INSERT INTO PROBLEMS VALUES (3, "TestProblem", 10, "Problem3");
+INSERT INTO Problems VALUES (1, "TestProblem", 10, "Problem1");
+INSERT INTO Problems VALUES (2, "TestProblem", 10, "Problem2");
+INSERT INTO Problems VALUES (3, "TestProblem", 10, "Problem3");
 
-INSERT INTO CHALLENGES (Challenge_ID, Problem_ID, Status) VALUES (1, 1, "InProgress");
-INSERT INTO CHALLENGES (Challenge_ID, Problem_ID, Status) VALUES (2, 2, "InProgress");
-INSERT INTO CHALLENGES (Challenge_ID, Problem_ID, Status) VALUES (3, 3, "InProgress");
+INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (1, 1, "InProgress");
+INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (2, 2, "InProgress");
+INSERT INTO Challenges (Challenge_ID, Problem_ID, Status) VALUES (3, 3, "InProgress");
 
-INSERT INTO TESTCASES VALUES (1, 1, "True", "testprecode", "testpostcode");
+INSERT INTO TestCases VALUES (1, 1, "True", "testprecode", "testpostcode");
 
 
 
