@@ -27,6 +27,8 @@ class Users(Template):
             itemDict['lastname'] = result[2]
             resultList.append(itemDict)
 
+        if len(resultList) < 1:
+            return None
         return resultList[0]
 
     def createUser(self, user_id, firstname, lastname):
