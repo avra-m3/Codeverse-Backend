@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import os
+import time
 from functools import wraps
 
 from flask import *
@@ -7,9 +8,10 @@ from flask_cors import CORS
 from flask_restful import Api, Resource
 
 import model
+import sphere_integration as sph
 from model.Challenges import Challenges as db_Challenges
-from model.Users import Users as db_Users
 from model.Problems import Problems as db_Problems
+from model.Users import Users as db_Users
 
 application = Flask(__name__)
 CORS(application)
@@ -28,7 +30,6 @@ def validate_request(*expected_args):
             json_object = request.json
 
             if json_object is None:
-                print(expected_args)
                 abort(400)
                 # message="Expected request body to contain JSON, try setting Content-Type to application/json")
             for arg in expected_args:
@@ -59,17 +60,22 @@ class Challenges(Resource):
     def get(self, challenge_id=None):
         if challenge_id is None:
             challenges = db_Challenges()
-            result = challenges.listChallenges('InProgress')
+            result = challenges.listChallenges('Waiting')
             return jsonify(result)
-        return None
+        ch = model.Challenges().getChallenge(challenge_id)
+        if ch is None:
+            abort(400)
+        return jsonify(ch)
 
     @validate_request('problem_id')
     def put(self, challenge_id=None):
+        if challenge_id is not None:
+            abort(400)
         req = request.json
         problem_id = req["problem_id"]
         challenges = db_Challenges()
-        challenge_id = challenges.createChallenge(problem_id, "InProgress")
-        return challenge_id, 200
+        challenge_id = challenges.createChallenge(problem_id, "Waiting")
+        return jsonify(challenges.getChallenge(challenge_id))
 
     @validate_request('status')
     def post(self, challenge_id=None):
@@ -91,29 +97,55 @@ class Collaborators(Resource):
         return jsonify(result)
 
     @validate_request('stream')
-    def put(self, challenge_id, user_id=None):
-        if user_id is not None:
+    def put(self, challenge_id, user_id):
+        if user_id is None:
             abort(400)
         db = model.Collaborators()
         challenge_db = model.Challenges()
         challenge = challenge_db.getChallenge(challenge_id)
         if challenge is None:
             abort(400)
-        if challenge["status"] not in ["created", "waiting"]:
+        if challenge["Status"] != "Waiting":
+            print(challenge)
             abort(412)
-        data = request.json()
-        result = db.createCollaborator(challenge_id, user_id, data["stream"], None, None, None, None)
-        if len(challenge_db.listChallenges(challenge_id)) >= 2:
-            challenge_db.updateChallengeStatus(challenge_id, "in progress")
-        else:
-            challenge_db.updateChallengeStatus(challenge_id, "waiting")
+        data = request.json
+        result = db.createCollaborator(challenge_id=challenge_id, user_id=user_id, playbackStream=data["stream"])
+        return jsonify(result)
 
-    @validate_request('code')
+    @validate_request()
     def post(self, challenge_id, user_id=None):
+        pass
         if user_id is None:
             abort(400)
+        data = request.json()
+        if "code" in data:
+            code = data["code"]
+            challenge = model.Challenges().getChallenge(challenge_id)
+            if challenge is None:
+                abort(400)
+            test_cases = model.TestCases().listTestCases(challenge["problem_id"])
+            if test_cases is None or len(test_cases) < 1:
+                abort(400)
+            case = test_cases[0]
+            code = case["Precode"] + code + case["Postcode"]
+            id = sph.submit(code)
+            db = model.Collaborators()
+            colab = db.getCollaborator(challenge_id, user_id)
+            if colab is None:
+                abort(400)
+            return jsonify(
+                db.updateCollaborator(challenge_id, user_id, colab["PlaybackStream"], "running", time.time(), None,
+                                      id))
         db = model.Collaborators()
-        db.updateCollaborator(challenge_id, user_id)
+        colab = db.getCollaborator(challenge_id, user_id)
+        if colab is None:
+            abort(400)
+        if colab["Status"] != "running":
+            return jsonify(colab)
+        result, status = sph.poll(colab["SubmissionID"])
+        if status:
+            db.updateCollaborator(challenge_id, user_id, colab["PlaybackStream"], result, colab["submittedAt"],
+                                  result["time"], colab["SubmissionID"])
 
 
 class Users(Resource):
@@ -135,12 +167,25 @@ class Users(Resource):
         return jsonify(db.createUser(user_id, firstname, lastname))
 
 
+class TestCode(Resource):
+    def get(self, id = None):
+        if id is None:
+            abort(400)
+        return sph.poll(id)
+
+    @validate_request('source')
+    def post(self, id = None):
+        if id is not None:
+            abort(400)
+        return sph.submit(source=request.json["source"])
+
+
 api.add_resource(Problems, '/problems/<string:problem_id>', '/problems', '/problems/')
 api.add_resource(Users, '/users/<string:user_id>', '/users', '/users/')
 api.add_resource(Challenges, '/challenges/<string:challenge_id>', '/challenges/', '/challenges')
 api.add_resource(Collaborators, '/challenges/<string:challenge_id>/collaborators/<string:user_id>',
                  '/challenges/<string:challenge_id>/collaborators/', '/challenges/<string:challenge_id>/collaborators')
-
+api.add_resource(TestCode, '/testing/<string:id>', '/testing/')
 if __name__ == '__main__':
     if os.getenv("PRODUCTION"):
         app.run(host='0.0.0.0', port=80)

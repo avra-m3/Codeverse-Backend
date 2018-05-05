@@ -5,9 +5,10 @@
 # Return dict with keys as db columns
 
 import datetime
-import pymysql
 
 from model.Template import Template
+
+
 # from Template import Template
 
 
@@ -28,7 +29,6 @@ class Collaborators(Template):
             return None
         self.myConnection.commit()
         queryResult = cur.fetchall()
-
 
         resultList = list()
 
@@ -59,7 +59,7 @@ class Collaborators(Template):
         queryResult = cur.fetchall()
         if cur.rowcount == 0:
             return None
-        
+
         resultList = list()
 
         for result in queryResult:
@@ -79,25 +79,26 @@ class Collaborators(Template):
 
     # createCollaborator(self, challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, submissionID)
 
-    def createCollaborator(self, challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime,
-                           submissionID):
+    def createCollaborator(self, challenge_id, user_id, playbackStream, codeStatus=None, submittedAt=None,
+                           executionTime=None, submissionID=None):
         dothisSQL = 'INSERT INTO Collaborators '
         dothisSQL += 'VALUES ( %s, %s, %s, %s, %s, %s, %s)'
         cur = self.myConnection.cursor()
         # print(dothisSQL)
-        cur.execute(dothisSQL,
+        result = cur.execute(dothisSQL,
                     (challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, submissionID))
         self.myConnection.commit()
-        return
+        return result
 
     # updateCollaborator(self, challenge_id, user_id)
     # Updates the user_id associated with a given challenge
     # update codeStatus, submittedate, executionTime, SubmissionID
 
-    def updateCollaborator(self, challenge_id, user_id, playbackStream, codeStatus, submittedAt, executionTime, 
-                        SubmissionID):
+    def updateCollaborator(self, challenge_id, user_id, playbackStream=None, codeStatus=None, submittedAt=None,
+                           executionTime=None,
+                           SubmissionID=None):
         dothisSQL = 'UPDATE Collaborators '
-        dothisSQL += 'SET PlaybackStream = %s, ' 
+        dothisSQL += 'SET PlaybackStream = %s, '
         dothisSQL += 'CodeStatus = %s, '
         dothisSQL += 'SubmittedAt = %s, '
         dothisSQL += 'ExecutionTime = %s, '
@@ -105,7 +106,8 @@ class Collaborators(Template):
         dothisSQL += 'WHERE Challenge_ID = %s '
         dothisSQL += 'AND User_ID = %s'
         cur = self.myConnection.cursor()
-        cur.execute(dothisSQL, (playbackStream, codeStatus, submittedAt, executionTime, SubmissionID, challenge_id, user_id))
+        cur.execute(dothisSQL,
+                    (playbackStream, codeStatus, submittedAt, executionTime, SubmissionID, challenge_id, user_id))
         self.myConnection.commit()
         if cur.rowcount == 0:
             return None
