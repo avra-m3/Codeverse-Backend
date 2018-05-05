@@ -117,13 +117,13 @@ class Collaborators(Resource):
         pass
         if user_id is None:
             abort(400)
-        data = request.json()
+        data = request.json
         if "code" in data:
             code = data["code"]
             challenge = model.Challenges().getChallenge(challenge_id)
             if challenge is None:
                 abort(400)
-            test_cases = model.TestCases().listTestCases(challenge["problem_id"])
+            test_cases = model.TestCases().listTestCases(challenge["Problem_ID"])
             if test_cases is None or len(test_cases) < 1:
                 abort(400)
             case = test_cases[0]
@@ -140,7 +140,7 @@ class Collaborators(Resource):
         colab = db.getCollaborator(challenge_id, user_id)
         if colab is None:
             abort(400)
-        if colab["Status"] != "running":
+        if colab["CodeStatus"] != "running":
             return jsonify(colab)
         result, status = sph.poll(colab["SubmissionID"])
         if status:
@@ -162,19 +162,21 @@ class Users(Resource):
         data = request.json
         firstname = data['firstname']
         lastname = data['lastname']
-        print(firstname, lastname, user_id)
         db = db_Users()
+        attempt = db.getUser(user_id)
+        if attempt is not None:
+            return jsonify(attempt)
         return jsonify(db.createUser(user_id, firstname, lastname))
 
 
 class TestCode(Resource):
-    def get(self, id = None):
+    def get(self, id=None):
         if id is None:
             abort(400)
         return sph.poll(id)
 
     @validate_request('source')
-    def post(self, id = None):
+    def post(self, id=None):
         if id is not None:
             abort(400)
         return sph.submit(source=request.json["source"])
