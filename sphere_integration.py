@@ -36,7 +36,7 @@ def submit(source, input="", lang=4):
         "input": input
     }
     print(content)
-    response = requests.post(url, headers=headers, data=content)
+    response = requests.post(url, headers=headers, json=content)
 
     if response.status_code != 201:
         print(response.content)
