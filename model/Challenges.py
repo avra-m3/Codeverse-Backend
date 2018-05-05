@@ -83,13 +83,19 @@ class Challenges(Template):
             itemDict['CreatedAt'] = result[2]
             itemDict['Status'] = result[3]
             resultList.append(itemDict)
-
+        if len(resultList) == 0:
+            return []
         return resultList[0]
+
+    def get_count(self, challenge_id):
+        sql = "select Count(*) from Collaborators WHERE ChallengeID = %s"
+        return self.myConnection.cursor().execute(sql, challenge_id)
 
 
 if __name__ == "__main__":
     challenges = Challenges()
-    print(challenges.createChallenge(2, "In progress"))
+    # print(challenges.createChallenge(2, "In progress"))
     print(challenges.listChallenges("InProgress"))
     print(challenges.getChallenge(1))
+    print(challenges.get_count(1))
     challenges.updateChallengeStatus(5, "Finalised")
