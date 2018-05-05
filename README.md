@@ -10,6 +10,20 @@ Run the following command from the project directory:
 
 This will install all required packages to run this project
 
+Environment Variables
+-----------------------
+In order to run this application you will need to install Environment variables, you can do this on windows with
+
+`set SPHERE_AUTH=<access token for sphere>`
+
+`set SPHERE_ENDPOINT=<personal endpoint for sphere>`
+
+You can set these on Mac with the following
+
+`export SPHERE_AUTH=<access token for sphere>`
+
+`export SPHERE_ENDPOINT=<personal endpoint for sphere>`
+
 Running the application
 -------------------------
 Run the following command
