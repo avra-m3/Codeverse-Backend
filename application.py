@@ -1,15 +1,13 @@
 #!/usr/bin/python3
 
 from functools import wraps
+
 from flask import *
 from flask_cors import CORS
 from flask_restful import Api, Resource
-from model.Users import Users as db_Users
+
 from model.Challenges import Challenges as db_Challenges
-from model.Problems import Problems as db_Problems 
-from model.TestCases import TestCases as db_TestCases
-from model.Collaborators import Collaborators as db_Collaborators
-import db_config as cfg
+from model.Users import Users as db_Users
 
 application = Flask(__name__)
 CORS(application)
@@ -19,6 +17,7 @@ api = Api(application)
 @application.route('/')
 def index():
     return Response('Online', status=200)
+
 
 def validate_request(*expected_args):
     def decorator(func):
@@ -96,7 +95,7 @@ class Users(Resource):
         return jsonify(db.getUser(user_id))
 
     @validate_request('firstname', 'lastname')
-    def put(self, user_id = None):
+    def put(self, user_id=None):
         if user_id is not None:
             abort(400)
         data = request.json()
