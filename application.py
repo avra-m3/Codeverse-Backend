@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import os
 from functools import wraps
 
 from flask import *
@@ -141,4 +141,7 @@ api.add_resource(Collaborators, '/challenges/<string:challenge_id>/collaborators
                  '/challenges/<string:challenge_id>/collaborators/', '/challenges/<string:challenge_id>/collaborators')
 
 if __name__ == '__main__':
-    api.run()
+    if os.getenv("PRODUCTION"):
+        app.run(host='0.0.0.0', port=80)
+    else:
+        api.run()
