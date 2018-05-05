@@ -6,6 +6,7 @@ from flask import *
 from flask_cors import CORS
 from flask_restful import Api, Resource
 
+import model
 from model.Challenges import Challenges as db_Challenges
 from model.Users import Users as db_Users
 
@@ -73,22 +74,43 @@ class Challenges(Resource):
             abort(400)
         req = request.json
         new_status = req["status"]
-        print(new_status)
-        print(challenge_id)
         challenges = db_Challenges()
         challenges.updateChallengeStatus(challenge_id, new_status)
 
+
 class Collaborators(Resource):
     def get(self, challenge_id, user_id=None):
+        db = model.Collaborators()
         if user_id is None:
-            abort(501)
+            result = db.listCollaborators(challenge_id)
+        else:
+            result = db.getCollaborator(challenge_id, user_id)
+        return jsonify(result)
 
+    @validate_request('stream')
     def put(self, challenge_id, user_id=None):
-        if user_id is None:
-            abort(501)
+        if user_id is not None:
+            abort(400)
+        db = model.Collaborators()
+        challenge_db = model.Challenges()
+        challenge = challenge_db.getChallenge(challenge_id)
+        if challenge is None:
+            abort(400)
+        if challenge["status"] not in ["created", "waiting"]:
+            abort(412)
+        data = request.json()
+        result = db.createCollaborator(challenge_id, user_id, data["stream"], None, None, None, None)
+        if len(challenge_db.listChallenges(challenge_id)) >= 2:
+            challenge_db.updateChallengeStatus(challenge_id, "in progress")
+        else:
+            challenge_db.updateChallengeStatus(challenge_id, "waiting")
 
+    @validate_request('code')
     def post(self, challenge_id, user_id=None):
-        pass
+        if user_id is None:
+            abort(400)
+        db = model.Collaborators()
+        db.updateCollaborator(challenge_id, user_id)
 
 
 class Users(Resource):
