@@ -173,17 +173,17 @@ class Users(Resource):
         return jsonify(db.createUser(user_id, firstname, lastname))
 
 
-class TestCode(Resource):
-    def get(self, id=None):
-        if id is None:
-            abort(400)
-        return sph.poll(id)
-
-    @validate_request('source')
-    def post(self, id=None):
-        if id is not None:
-            abort(400)
-        return sph.submit(source=request.json["source"])
+# class TestCode(Resource):
+#     def get(self, id=None):
+#         if id is None:
+#             abort(400)
+#         return sph.poll(id)
+#
+#     @validate_request('source')
+#     def post(self, id=None):
+#         if id is not None:
+#             abort(400)
+#         return sph.submit(source=request.json["source"])
 
 
 api.add_resource(Problems, '/problems/<string:problem_id>', '/problems', '/problems/')
@@ -191,7 +191,7 @@ api.add_resource(Users, '/users/<string:user_id>', '/users', '/users/')
 api.add_resource(Challenges, '/challenges/<string:challenge_id>', '/challenges/', '/challenges')
 api.add_resource(Collaborators, '/challenges/<string:challenge_id>/collaborators/<string:user_id>',
                  '/challenges/<string:challenge_id>/collaborators/', '/challenges/<string:challenge_id>/collaborators')
-api.add_resource(TestCode, '/testing/<string:id>', '/testing/')
+# api.add_resource(TestCode, '/testing/<string:id>', '/testing/')
 if __name__ == '__main__':
     if os.getenv("PRODUCTION"):
         app.run(host='0.0.0.0', port=80)
