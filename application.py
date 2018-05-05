@@ -37,11 +37,6 @@ def validate_request(*expected_args):
     return decorator
 
 
-# @application.route('/problems', methods=['GET'])
-# def list_problems(self):
-#     pass
-
-
 class Problems(Resource):
     def get(self, problem_id=None):
         if problem_id is None:
@@ -50,38 +45,41 @@ class Problems(Resource):
 
 
 class Challenges(Resource):
-    def get(self, challenge_id):
+    def get(self, challenge_id=None):
         pass
 
-    def put(self, challenge_id):
+    def put(self, challenge_id=None):
         pass
 
-    def post(self, challenge_id):
+    def post(self, challenge_id=None):
         pass
-
-
-@application.route('/challenges/<string:challenge_id>/collaborators', methods=['GET'])
-def list_collaborators(challenge_id):
-    pass
 
 
 class Collaborators(Resource):
-    def get(self, challenge_id, user_id):
-        pass
+    def get(self, challenge_id, user_id=None):
+        if user_id is None:
+            abort(501)
 
-    def put(self, challenge_id, user_id):
-        pass
+    def put(self, challenge_id, user_id=None):
+        if user_id is None:
+            abort(501)
 
-    def post(self, challenge_id, user_id):
+    def post(self, challenge_id, user_id=None):
         pass
 
 
 class Users(Resource):
-    def get(self, user_id):
-        return "test"
+    def get(self, user_id=None):
+        if user_id is None:
+            abort(501)
+        pass
 
     @validate_request('user_id', 'firstname', 'lastname')
     def put(self, user_id=None):
+        data = request.json()
+        user_id = user_id or data["user_id"]
+        firstname = data['firstname']
+        lastname = data['lastname']
         pass
 
 
@@ -89,7 +87,7 @@ api.add_resource(Problems, '/problems/<string:problem_id>', '/problems', '/probl
 api.add_resource(Users, '/users/<string:user_id>', '/users', '/users/')
 api.add_resource(Challenges, '/challenges/<string:challenge_id>' '/challenges/', '/challenges')
 api.add_resource(Collaborators, '/challenges/<string:challenge_id>/collaborators/<string:user_id>',
-                 'challenges/<string:challenge_id>/collaborators/', 'challenges/<string:challenge_id>/collaborators')
+                 '/challenges/<string:challenge_id>/collaborators/', '/challenges/<string:challenge_id>/collaborators')
 
 if __name__ == '__main__':
     api.run()
