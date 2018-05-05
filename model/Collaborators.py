@@ -106,11 +106,11 @@ class Collaborators(Template):
         dothisSQL += 'WHERE Challenge_ID = %s '
         dothisSQL += 'AND User_ID = %s'
         cur = self.myConnection.cursor()
-        cur.execute(dothisSQL,
+        result = cur.execute(dothisSQL,
                     (playbackStream, codeStatus, submittedAt, executionTime, SubmissionID, challenge_id, user_id))
         self.myConnection.commit()
         if cur.rowcount == 0:
-            return None
+            return False
         return True
 
 

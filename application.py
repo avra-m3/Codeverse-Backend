@@ -143,9 +143,13 @@ class Collaborators(Resource):
         if colab["CodeStatus"] != "running":
             return jsonify(colab)
         result, status = sph.poll(colab["SubmissionID"])
+
         if status:
-            db.updateCollaborator(challenge_id, user_id, colab["PlaybackStream"], result, colab["submittedAt"],
-                                  result["time"], colab["SubmissionID"])
+            if not db.updateCollaborator(challenge_id, user_id, colab["PlaybackStream"], json.dumps(result),
+                                         colab["SubmittedAt"],
+                                         result["time"], colab["SubmissionID"]):
+                abort(500)
+            return db.getCollaborator(challenge_id, user_id)
 
 
 class Users(Resource):

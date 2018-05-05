@@ -87,4 +87,4 @@ def poll(id):
         "memory": data["memory"],
         "output": output
     }
-    return result, data["result"] == 15
+    return result, data["status"] == 0
