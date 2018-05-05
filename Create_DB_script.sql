@@ -14,28 +14,6 @@ CREATE TABLE Users(
 	PRIMARY KEY( User_ID)
 );
 
-
-CREATE TABLE Collaborators(
-	Challenge_ID INT,
-	User_ID INT,
-	PlaybackStream MEDIUMTEXT,
-	CodeStatus VARCHAR(20),
-	SubmittedAt DATETIME DEFAULT NULL,
-	ExecutionTime INT
-	PRIMARY KEY( Challenge_ID, User_ID)
-	FOREIGN KEY(User_ID) REFERENCES Users(User_ID)
-	FOREIGN KEY(Challenge_ID) REFERENCES Challenges(Challenge_ID)
-);
-
-CREATE TABLE Challenges(
-	Challenge_ID INT NOT NULL AUTO_INCREMENT,
-	Problem_ID INT,
-	CreatedAt DATETIME,
-	Status VARCHAR(20),
-	PRIMARY KEY( Challenge_ID)
-	FOREIGN KEY(Problem_ID) REFERENCES Problems(Problem_ID)
-);
-
 CREATE TABLE Problems(
 	Problem_ID INT NOT NULL AUTO_INCREMENT,
 	ProblemStatement MEDIUMTEXT,
@@ -44,14 +22,52 @@ CREATE TABLE Problems(
 	PRIMARY KEY(Problem_ID)
 );
 
+CREATE TABLE Challenges(
+	Challenge_ID INT NOT NULL AUTO_INCREMENT,
+	Problem_ID INT,
+	CreatedAt DATETIME DEFAULT Now(),
+	Status VARCHAR(20) DEFAULT 'Created',
+	PRIMARY KEY( Challenge_ID),
+	FOREIGN KEY(Problem_ID) REFERENCES Problems(Problem_ID)
+);
+
+CREATE TABLE Collaborators(
+	Challenge_ID INT,
+	User_ID INT,
+	PlaybackStream MEDIUMTEXT,
+	CodeStatus VARCHAR(20),
+	SubmittedAt DATETIME DEFAULT NULL,
+	ExecutionTime INT,
+	SubmissionID VARCHAR(20),
+	PRIMARY KEY( Challenge_ID, User_ID),
+	FOREIGN KEY( User_ID) REFERENCES Users(User_ID),
+	FOREIGN KEY( Challenge_ID) REFERENCES Challenges(Challenge_ID)
+);
+
 CREATE TABLE TestCases(
 	TestCase_ID INT NOT NULL AUTO_INCREMENT,
 	Problem_ID INT,
 	ExpectedOutput VARCHAR(100),
 	Precode MEDIUMTEXT,
 	Postcode MEDIUMTEXT,
-	PRIMARY KEY(ProblemOutput_ID)
+	PRIMARY KEY(TestCase_ID),
 	FOREIGN KEY(Problem_ID) REFERENCES Problems(Problem_ID)
 );
+
+INSERT INTO USERS VALUES (1, "Test", "User1");
+INSERT INTO USERS VALUES (2, "Test", "User2");
+INSERT INTO USERS VALUES (3, "Test", "User3");
+
+INSERT INTO PROBLEMS VALUES (1, "TestProblem", 10, "Problem1");
+INSERT INTO PROBLEMS VALUES (2, "TestProblem", 10, "Problem2");
+INSERT INTO PROBLEMS VALUES (3, "TestProblem", 10, "Problem3");
+
+INSERT INTO CHALLENGES (Challenge_ID, Problem_ID, Status) VALUES (1, 1, "InProgress");
+INSERT INTO CHALLENGES (Challenge_ID, Problem_ID, Status) VALUES (2, 2, "InProgress");
+INSERT INTO CHALLENGES (Challenge_ID, Problem_ID, Status) VALUES (3, 3, "InProgress");
+
+INSERT INTO TESTCASES VALUES (1, 1, "True", "testprecode", "testpostcode");
+
+
 
 
