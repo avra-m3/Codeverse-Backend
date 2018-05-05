@@ -1,8 +1,15 @@
-from functools import wraps
+#!/usr/bin/python3
 
+from functools import wraps
 from flask import *
 from flask_cors import CORS
 from flask_restful import Api, Resource
+from model.Users import Users as db_Users
+from model.Challenges import Challenges as db_Challenges
+from model.Problems import Problems as db_Problems 
+from model.TestCases import TestCases as db_TestCases
+from model.Collaborators import Collaborators as db_Collaborators
+import db_config as cfg
 
 application = Flask(__name__)
 CORS(application)
@@ -12,7 +19,6 @@ api = Api(application)
 @application.route('/')
 def index():
     return Response('Online', status=200)
-
 
 def validate_request(*expected_args):
     def decorator(func):
@@ -46,7 +52,17 @@ class Problems(Resource):
 
 class Challenges(Resource):
     def get(self, challenge_id=None):
-        pass
+        if challenge_id is None:
+            chal = db_Challenges()
+
+            r = chal.listChallenges('InProgress')
+            print(r)
+            print(jsonify(r))
+            # for item in result:
+            #     print(item, type(item))
+            # # print(result)
+            return jsonify(r)
+        return None
 
     def put(self, challenge_id=None):
         pass
@@ -71,6 +87,7 @@ class Collaborators(Resource):
 class Users(Resource):
     def get(self, user_id=None):
         if user_id is None:
+
             abort(501)
         pass
 
