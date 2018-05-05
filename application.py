@@ -8,6 +8,7 @@ from flask_restful import Api, Resource
 
 from model.Challenges import Challenges as db_Challenges
 from model.Users import Users as db_Users
+from model.Problems import Problems as db_Problems
 
 application = Flask(__name__)
 CORS(application)
@@ -44,9 +45,13 @@ def validate_request(*expected_args):
 
 class Problems(Resource):
     def get(self, problem_id=None):
+        problems = db_Problems()
         if problem_id is None:
-            return "all problems"
-        return "get problem" + problem_id
+            result = problems.listProblems()
+        else:
+            result = problems.getProblem(problem_id)
+
+        return jsonify(result)
 
 
 class Challenges(Resource):
