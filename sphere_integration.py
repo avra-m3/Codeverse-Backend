@@ -83,7 +83,7 @@ def poll(id):
         "id": id,
         "status": "finished",
         "time": data["time"],
-        "success": data["result"] != 15,
+        "success": data["result"] == 15,
         "memory": data["memory"],
         "output": output
     }

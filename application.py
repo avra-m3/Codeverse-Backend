@@ -88,7 +88,7 @@ class Users(Resource):
 class Test(Resource):
     def get(self, challenge_id, user_id, test_id):
         result = sph.poll(test_id)
-        return result
+        return jsonify(result)
 
     @validate_request('source')
     def put(self, challenge_id, user_id, test_id):
