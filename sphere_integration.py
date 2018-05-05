@@ -36,14 +36,14 @@ def submit(source, input="", lang=4):
         "input": input
     }
     print(content)
-    # response = requests.post(url, headers=headers, data=content)
+    response = requests.post(url, headers=headers, data=content)
 
-    # if response.status_code != 201:
-    #     print(response.content)
-    #     print(response.status_code)
-    #     abort(502)
-    # return response.json()["id"]
-    #
+    if response.status_code != 201:
+        print(response.content)
+        print(response.status_code)
+        abort(502)
+    return response.json()["id"]
+
 
 def poll(id):
     url = ENDPOINT + '/api/v3/submissions/' + id
